@@ -3,6 +3,7 @@
 Created on Fri Feb  2 15:05:45 2018
 
 @author: mayan
+github: https://github.com/mjthedevil
 """
 
 import sys
