@@ -13,7 +13,7 @@ import telepot
 from telepot.loop import MessageLoop
 from PyDictionary import PyDictionary
 os.chdir('C:/Users/mayan/Desktop/telegrambot')
-from dictionary_dot_com import requester, definition, example_sentences, getWord
+from dictionary_dot_com import requester, definition, example_sentences, getWord, pronounciation
 #from dictionary_dot_com import synonym_forms, brit_definition, brit_origin_data, origin_data, related_forms
 dictionary=PyDictionary()
 
@@ -55,6 +55,9 @@ def handle(msg):
         bot.sendMessage(chat_id,pydi)    
         bot.sendMessage(chat_id,definition_2)        
         bot.sendMessage(chat_id,example)
+        pronunciation,file_name = pronounciation(block)
+        bot.sendMessage(chat_id,pronunciation)
+        bot.sendAudio(chat_id, open(file_name,'rb'), title=msg['text'])
 
 TOKEN = '<Enter token from telegram here>'
 

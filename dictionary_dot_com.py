@@ -8,8 +8,7 @@ github: https://github.com/mjthedevil
 
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
-    
+from datetime import datetime
 def requester(search_tearm):    
 #    search_tearm='dream'
     url = "http://www.dictionary.com/browse/{}?s=t".format(search_tearm)
@@ -143,7 +142,59 @@ def getWord(origin = False, citation = False, date='/'.join(str(datetime.now().d
         citation_2=''   
     return wordDay + definition + citation_2
 
-#block = requester('believe')
+def get_pronunciation(def_head,_PRONUNCIATION_CLASS):
+    try:
+        pronunciation = def_head.find(class_=_PRONUNCIATION_CLASS) \
+                                .get_text().strip()
+    except:
+        return None
+    return pronunciation
+
+
+def get_pronunciation_url(block,_PRONUNCIATION_AUDIO_TYPE_CLASS):
+    try:
+        p_url = block.find('source',{'type':_PRONUNCIATION_AUDIO_TYPE_CLASS}).get('src')
+    except:
+        return None
+    return p_url
+
+
+def save_to_mp3(url,word):   
+    """
+    Saves mp3 pronunciation sound file.
+    Keyword Arguments:
+    file_name -- name of the file, must include .mp3 suffix (default self.word + '.mp3')
+    """
+    file_name = word + '.mp3'
+    try:
+        with open(file_name, 'wb') as mp3_file:
+            file_url = url
+            mp3_file.write(requests.get(file_url).content)
+            print("writing to: {0}".format(file_name))
+            return file_name
+    except (FileNotFoundError, PermissionError) as e:
+        print("Failed to save mp3 file: {error}".format(error=e))
+
+def pronounciation(block):
+    _MAIN_CONTAINER_CLASS = 'source-box'
+    _PRONUNCIATION_CLASS = 'spellpron'
+    _PRONUNCIATION_AUDIO_TYPE_CLASS = 'audio/mpeg' 
+    _WORD_CLASS = 'head-entry'
+    main = block.find(class_=_MAIN_CONTAINER_CLASS)
+    word = block.find(class_=_WORD_CLASS).text.strip()
+    pronunciation = get_pronunciation(main,_PRONUNCIATION_CLASS)
+    pronunciation_url = get_pronunciation_url(main,_PRONUNCIATION_AUDIO_TYPE_CLASS)
+    print(pronunciation)
+#    print(pronunciation_url)
+    file_name = save_to_mp3(pronunciation_url,word)
+    return pronunciation,file_name
+    
+
+#block= requester('Otorhinolaryngologist')
+#pronunciation,file_name = pronounciation(block)
+
+
+
 #print(definition(block))
 #print(origin_data(block))
 #print(related_forms(block))
